@@ -5,7 +5,8 @@ using namespace RE;
 #pragma region Utilities
 
 char tempbuf[8192] = { 0 };
-char* _MESSAGE(const char* fmt, ...) {
+char* _MESSAGE(const char* fmt, ...)
+{
 	va_list args;
 
 	va_start(args, fmt);
@@ -16,7 +17,8 @@ char* _MESSAGE(const char* fmt, ...) {
 	return tempbuf;
 }
 
-void Dump(const void* mem, unsigned int size) {
+void Dump(const void* mem, unsigned int size)
+{
 	const char* p = static_cast<const char*>(mem);
 	unsigned char* up = (unsigned char*)p;
 	std::stringstream stream;
@@ -25,14 +27,14 @@ void Dump(const void* mem, unsigned int size) {
 		stream << std::setfill('0') << std::setw(2) << std::hex << (int)up[i] << " ";
 		if (i % 8 == 7) {
 			stream << "\t0x"
-				<< std::setw(2) << std::hex << (int)up[i]
-				<< std::setw(2) << (int)up[i - 1]
-				<< std::setw(2) << (int)up[i - 2]
-				<< std::setw(2) << (int)up[i - 3]
-				<< std::setw(2) << (int)up[i - 4]
-				<< std::setw(2) << (int)up[i - 5]
-				<< std::setw(2) << (int)up[i - 6]
-				<< std::setw(2) << (int)up[i - 7] << std::setfill('0');
+				   << std::setw(2) << std::hex << (int)up[i]
+				   << std::setw(2) << (int)up[i - 1]
+				   << std::setw(2) << (int)up[i - 2]
+				   << std::setw(2) << (int)up[i - 3]
+				   << std::setw(2) << (int)up[i - 4]
+				   << std::setw(2) << (int)up[i - 5]
+				   << std::setw(2) << (int)up[i - 6]
+				   << std::setw(2) << (int)up[i - 7] << std::setfill('0');
 			stream << "\t0x" << std::setw(2) << std::hex << row * 8 << std::setfill('0');
 			_MESSAGE("%s", stream.str().c_str());
 			stream.str(std::string());
@@ -41,8 +43,9 @@ void Dump(const void* mem, unsigned int size) {
 	}
 }
 
-template<class Ty>
-Ty SafeWrite64Function(uintptr_t addr, Ty data) {
+template <class Ty>
+Ty SafeWrite64Function(uintptr_t addr, Ty data)
+{
 	DWORD oldProtect;
 	void* _d[2];
 	memcpy(_d, &data, sizeof(data));
@@ -57,7 +60,8 @@ Ty SafeWrite64Function(uintptr_t addr, Ty data) {
 	return olddata;
 }
 
-ActorValueInfo* GetAVIFByEditorID(std::string editorID) {
+ActorValueInfo* GetAVIFByEditorID(std::string editorID)
+{
 	TESDataHandler* dh = TESDataHandler::GetSingleton();
 	BSTArray<ActorValueInfo*> avifs = dh->GetFormArray<ActorValueInfo>();
 	for (auto it = avifs.begin(); it != avifs.end(); ++it) {
@@ -68,7 +72,8 @@ ActorValueInfo* GetAVIFByEditorID(std::string editorID) {
 	return nullptr;
 }
 
-BGSExplosion* GetExplosionByFullName(std::string explosionname) {
+BGSExplosion* GetExplosionByFullName(std::string explosionname)
+{
 	TESDataHandler* dh = TESDataHandler::GetSingleton();
 	BSTArray<BGSExplosion*> explosions = dh->GetFormArray<BGSExplosion>();
 	for (auto it = explosions.begin(); it != explosions.end(); ++it) {
@@ -79,7 +84,8 @@ BGSExplosion* GetExplosionByFullName(std::string explosionname) {
 	return nullptr;
 }
 
-SpellItem* GetSpellByFullName(std::string spellname) {
+SpellItem* GetSpellByFullName(std::string spellname)
+{
 	TESDataHandler* dh = TESDataHandler::GetSingleton();
 	BSTArray<SpellItem*> spells = dh->GetFormArray<SpellItem>();
 	for (auto it = spells.begin(); it != spells.end(); ++it) {
@@ -90,7 +96,8 @@ SpellItem* GetSpellByFullName(std::string spellname) {
 	return nullptr;
 }
 
-TESForm* GetFormFromMod(std::string modname, uint32_t formid) {
+TESForm* GetFormFromMod(std::string modname, uint32_t formid)
+{
 	if (!modname.length() || !formid)
 		return nullptr;
 	TESDataHandler* dh = TESDataHandler::GetSingleton();
@@ -108,8 +115,7 @@ TESForm* GetFormFromMod(std::string modname, uint32_t formid) {
 	uint32_t id = formid;
 	if (modIndex < 0xFE) {
 		id |= ((uint32_t)modIndex) << 24;
-	}
-	else {
+	} else {
 		uint16_t lightModIndex = modFile->smallFileCompileIndex;
 		if (lightModIndex != 0xFFFF) {
 			id |= 0xFE000000 | (uint32_t(lightModIndex) << 12);
@@ -118,34 +124,41 @@ TESForm* GetFormFromMod(std::string modname, uint32_t formid) {
 	return TESForm::GetFormByID(id);
 }
 
-bool CheckPA(Actor* a) {
+bool CheckPA(Actor* a)
+{
 	if (!a->extraList) {
 		return false;
 	}
-	return a->extraList->HasType(EXTRA_DATA_TYPE::kPowerArmor);;
+	return a->extraList->HasType(EXTRA_DATA_TYPE::kPowerArmor);
+	;
 }
 
-namespace F4 {
-	struct Unk {
+namespace F4
+{
+	struct Unk
+	{
 		uint32_t unk00 = 0xFFFFFFFF;
 		uint32_t unk04 = 0x0;
 		uint32_t unk08 = 1;
 	};
 
-	bool PlaySound(BGSSoundDescriptorForm* sndr, NiPoint3 pos, NiAVObject* node) {
+	bool PlaySound(BGSSoundDescriptorForm* sndr, NiPoint3 pos, NiAVObject* node)
+	{
 		typedef bool* func_t(Unk, BGSSoundDescriptorForm*, NiPoint3, NiAVObject*);
 		REL::Relocation<func_t> func{ REL::ID(376497) };
 		Unk u;
 		return func(u, sndr, pos, node);
 	}
 
-	void ShakeCamera(float mul, NiPoint3 origin, float duration, float strength) {
+	void ShakeCamera(float mul, NiPoint3 origin, float duration, float strength)
+	{
 		using func_t = decltype(&F4::ShakeCamera);
 		REL::Relocation<func_t> func{ REL::ID(758209) };
 		return func(mul, origin, duration, strength);
 	}
 
-	void ApplyImageSpaceModifier(TESImageSpaceModifier* imod, float strength, NiAVObject* target) {
+	void ApplyImageSpaceModifier(TESImageSpaceModifier* imod, float strength, NiAVObject* target)
+	{
 		using func_t = decltype(&F4::ApplyImageSpaceModifier);
 		REL::Relocation<func_t> func{ REL::ID(179769) };
 		return func(imod, strength, target);
@@ -165,7 +178,8 @@ std::vector<BGSProjectile*> EFDProjectiles;
 size_t maxTier;
 std::vector<uint16_t> helmetRatings;
 std::vector<uint16_t> vestRatings;
-struct CartridgeData {
+struct CartridgeData
+{
 	std::vector<uint16_t> protectionChances;
 	std::vector<float> deathConditions;
 	float fatalityIncrement;
@@ -212,7 +226,8 @@ std::vector<BGSBodyPartData::PartType> rarmParts = { BGSBodyPartData::PartType::
 std::vector<BGSBodyPartData::PartType> rlegParts = { BGSBodyPartData::PartType::RightLeg1, BGSBodyPartData::PartType::RightFoot };
 std::vector<TESRace*> deathMarkExcludedList;
 
-enum EFDBodyParts {
+enum EFDBodyParts
+{
 	None,
 	Head,
 	Torso,
@@ -245,7 +260,8 @@ ActorValueInfo** EFDConditions[] = {
 };
 
 //부위별 출혈 데이터 설정
-struct BleedingData {
+struct BleedingData
+{
 	SpellItem* spell;
 	float conditionStart;
 	float conditionThreshold;
@@ -254,7 +270,8 @@ struct BleedingData {
 	float initialDamage;
 	float multiplier;
 	float duration;
-	void PrintData() {
+	void PrintData()
+	{
 		_MESSAGE("Condition Start %f", conditionStart);
 		_MESSAGE("Condition Threshold %f", conditionThreshold);
 		_MESSAGE("Chance Min %f", chanceMin);
@@ -270,12 +287,14 @@ REL::Relocation<float*> ptr_engineTime{ REL::ID(599343) };	//엔진 내부 업�
 BGSExplosion* globalExplosion;
 
 //즉사 공식, 방어력 데미지 설정
-struct GlobalData {
+struct GlobalData
+{
 	float formulaA;
 	float formulaB;
 	float formulaC;
 	float formulaD;
-	void PrintData() {
+	void PrintData()
+	{
 		_MESSAGE("FormulaA %f", formulaA);
 		_MESSAGE("FormulaB %f", formulaB);
 		_MESSAGE("FormulaC %f", formulaC);
@@ -286,11 +305,13 @@ GlobalData gdHead;
 GlobalData gdTorso;
 
 //즉사 커트라인 조정
-struct FatalityIncrement {
+struct FatalityIncrement
+{
 	float formulaA;
 	float formulaB;
 	float formulaC;
-	void PrintData() {
+	void PrintData()
+	{
 		_MESSAGE("FormulaA %f", formulaA);
 		_MESSAGE("FormulaB %f", formulaB);
 		_MESSAGE("FormulaC %f", formulaC);
@@ -302,7 +323,8 @@ FatalityIncrement fi;
 
 #pragma region Data Initial Setup
 //탄약 화이트리스트 함수
-std::unordered_map<TESAmmo*, bool> GetAmmunitionWhitelist() {
+std::unordered_map<TESAmmo*, bool> GetAmmunitionWhitelist()
+{
 	std::unordered_map<TESAmmo*, bool> ret;
 
 	//게임에 로드된 폼 중 탄약만 가져온다
@@ -311,7 +333,7 @@ std::unordered_map<TESAmmo*, bool> GetAmmunitionWhitelist() {
 
 	globalExplosion = GetExplosionByFullName("EFD Global Explosion");
 	_MESSAGE("EFD Global Explosion %llx", globalExplosion);
-	
+
 	//모든 탄약 폼에 대하여
 	for (auto it = ammos.begin(); it != ammos.end(); ++it) {
 		TESAmmo* ammo = *it;
@@ -335,7 +357,8 @@ std::unordered_map<TESAmmo*, bool> GetAmmunitionWhitelist() {
 	return ret;
 }
 
-void SetupWeapons() {
+void SetupWeapons()
+{
 	uint16_t uniqueDmg = (uint16_t)std::stoi(ini.GetValue("General", "UniqueDamage", "15"));
 	_MESSAGE("UniqueDamage %d", uniqueDmg);
 
@@ -382,7 +405,8 @@ void SetupWeapons() {
 	}
 }
 
-void SetupArmors() {
+void SetupArmors()
+{
 	CSimpleIniA::TNamesDepend helmetKeys;
 	ini.GetAllKeys("Helmet", helmetKeys);
 	helmetKeys.sort(CSimpleIniA::Entry::LoadOrder());
@@ -428,7 +452,8 @@ void SetupArmors() {
 	}*/
 }
 
-void SetupDeathMark() {
+void SetupDeathMark()
+{
 	/*CSimpleIniA::TNamesDepend cartridgeKeys;
 	ini.GetAllKeys("Cartridges", cartridgeKeys);
 	_MESSAGE("Cartridges");
@@ -499,8 +524,7 @@ void SetupDeathMark() {
 			for (int i = 0; i < maxTier; ++i) {
 				laserChances.push_back(0);
 			}
-		}
-		else {
+		} else {
 			for (int i = 0; i < maxTier - laserChances.size(); ++i) {
 				laserChances.push_back(laserChances[laserChances.size() - 1]);
 				_MESSAGE("%d", laserChances[laserChances.size() - 1]);
@@ -511,7 +535,6 @@ void SetupDeathMark() {
 	laserCd.deathConditions = laserConditions;
 	laserCd.protectionChances = laserChances;
 	cartridgeData.insert(std::pair<std::string, CartridgeData>(std::string("Laser"), laserCd));
-
 
 	_MESSAGE("Physical Projectiles");
 	headChance = std::stof(ini.GetValue("CartridgeFatalities", "PhysicalHead"));
@@ -529,12 +552,10 @@ void SetupDeathMark() {
 	gdTorso.formulaD = std::stof(ini.GetValue("PhysicalTorso", "FormulaD"));
 	gdTorso.PrintData();
 
-
 	fi.formulaA = std::stof(ini.GetValue("FatalityIncrement", "FormulaA"));
 	fi.formulaB = std::stof(ini.GetValue("FatalityIncrement", "FormulaB"));
 	fi.formulaC = std::stof(ini.GetValue("FatalityIncrement", "FormulaC"));
 	fi.PrintData();
-
 
 	headFatalityDecPerTier = std::stof(ini.GetValue("CartridgeFatalities", "HeadFatalityDecreasePerTier"));
 	_MESSAGE("HeadFatalityDecreasePerTier %f", headFatalityDecPerTier);
@@ -552,7 +573,6 @@ void SetupDeathMark() {
 	globalCd.deathConditions = globalConditions;
 	globalCd.protectionChances = globalChances;
 	cartridgeData.insert(std::pair<std::string, CartridgeData>(std::string("Global"), globalCd));
-
 
 	deathmarked = GetAVIFByEditorID("EFD_DeathMark");
 	lasthitpart = GetAVIFByEditorID("EFD_LastHitPart");
@@ -612,8 +632,7 @@ void SetupDeathMark() {
 		BGSKeyword** keywords = (*it)->keywords;
 		uint32_t i = 0;
 		while (i < (*it)->numKeywords) {
-			if (keywords[i] == actorTypeLibertyPrime || keywords[i] == actorTypeMirelurk
-				|| keywords[i] == actorTypeRobot || keywords[i] == actorTypeTurret || keywords[i] == isVertibird) {
+			if (keywords[i] == actorTypeLibertyPrime || keywords[i] == actorTypeMirelurk || keywords[i] == actorTypeRobot || keywords[i] == actorTypeTurret || keywords[i] == isVertibird) {
 				deathMarkExcludedList.push_back(*it);
 				i = (*it)->numKeywords;
 				_MESSAGE("%s excluded from headshot", (*it)->GetFullName());
@@ -634,7 +653,8 @@ void SetupDeathMark() {
 	_MESSAGE("EFD Avoided Death Buzzing %llx", avoidedDeathBuzzing);
 }
 
-void SetupBleeding() {
+void SetupBleeding()
+{
 	BleedingData bldHead;
 	bldHead.spell = GetSpellByFullName(std::string("EFD Condition Bleed Head"));
 	bldHead.conditionStart = std::stof(ini.GetValue("BleedingHead", "ConditionStart"));
@@ -737,24 +757,27 @@ void SetupBleeding() {
 
 #pragma region Events
 
-struct ActorEquipManagerEvent::Event {
-	uint32_t unk00;				//00
-	uint8_t pad04[0x7 - 0x4];	//04
-	bool isUnequip;				//07
-	void* unk08;				//08	
-	Actor* a;					//10	equip target
+struct ActorEquipManagerEvent::Event
+{
+	uint32_t unk00;			   //00
+	uint8_t pad04[0x7 - 0x4];  //04
+	bool isUnequip;			   //07
+	void* unk08;			   //08
+	Actor* a;				   //10	equip target
 };
 
-struct TESObjectLoadedEvent {
-	uint32_t formId;			//00
-	uint8_t loaded;				//08
+struct TESObjectLoadedEvent
+{
+	uint32_t formId;  //00
+	uint8_t loaded;	  //08
 };
 
-struct TESEquipEvent {
-	Actor* a;					//00
-	uint32_t formId;			//0C
-	uint32_t unk08;				//08
-	uint64_t flag;				//10 0x00000000ff000000 for unequip
+struct TESEquipEvent
+{
+	Actor* a;		  //00
+	uint32_t formId;  //0C
+	uint32_t unk08;	  //08
+	uint64_t flag;	  //10 0x00000000ff000000 for unequip
 };
 
 //*********************Biped Slots********************
@@ -776,7 +799,8 @@ struct TESEquipEvent {
 // 45	-	0x8000
 //****************************************************
 
-void SetHelmetTier(Actor* a, uint16_t rating) {
+void SetHelmetTier(Actor* a, uint16_t rating)
+{
 	size_t i = helmetRatings.size() - 1;
 	bool intervalFound = false;
 	while (i >= 0 && !intervalFound) {
@@ -791,7 +815,8 @@ void SetHelmetTier(Actor* a, uint16_t rating) {
 	//_MESSAGE("Helmet rating %d tier %f", rating, a->GetActorValue(*helmetTier));
 }
 
-void SetVestTier(Actor* a, uint16_t rating) {
+void SetVestTier(Actor* a, uint16_t rating)
+{
 	size_t i = vestRatings.size() - 1;
 	bool intervalFound = false;
 	while (i >= 0 && !intervalFound) {
@@ -801,12 +826,23 @@ void SetVestTier(Actor* a, uint16_t rating) {
 		}
 		--i;
 	}
-	if(!intervalFound)
+	if (!intervalFound)
 		a->SetActorValue(*vestTier, 0);
 	//_MESSAGE("Vest rating %d tier %f", rating, a->GetActorValue(*vestTier));
 }
 
-void CalculateArmorTiers(Actor* a) {
+void SetRicochetValue(Actor* a)
+{
+	int ActorHelmetTier = a->GetActorValue(*helmetTier);
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<int> dis(ActorHelmetTier * 2, ActorHelmetTier * 4);
+	int RicochetValue = dis(gen);
+	a->SetActorValue(*ActorHeadDeathAvoid, RicochetValue);
+}
+
+void CalculateArmorTiers(Actor* a)
+{
 	uint16_t vestAR = 0;
 	uint16_t helmetAR = 0;
 	if (!a->inventoryList) {
@@ -819,14 +855,13 @@ void CalculateArmorTiers(Actor* a) {
 			TESObjectARMO::InstanceData* invdata = &(invarmor->data);
 			TESObjectARMO::InstanceData* instanceData = invdata;
 			if (invitem->stackData->IsEquipped()) {
-				if (invarmor->bipedModelData.bipedObjectSlots & 0x800 || invarmor->bipedModelData.bipedObjectSlots & 0x40) {		//Vest
+				if (invarmor->bipedModelData.bipedObjectSlots & 0x800 || invarmor->bipedModelData.bipedObjectSlots & 0x40) {  //Vest
 					ExtraInstanceData* extraInstanceData = (ExtraInstanceData*)invitem->stackData->extra->GetByType(EXTRA_DATA_TYPE::kInstanceData);
 					uint16_t currentVestAR = 0;
 					if (extraInstanceData) {
 						instanceData = ((TESObjectARMO::InstanceData*)extraInstanceData->data.get());
 						currentVestAR = instanceData->rating;
-					}
-					else {
+					} else {
 						currentVestAR = instanceData->rating;
 					}
 					if (invarmor->bipedModelData.bipedObjectSlots & 0x7) {	//Vest has helmet
@@ -840,14 +875,12 @@ void CalculateArmorTiers(Actor* a) {
 							}
 						}
 					}
-				}
-				else if (invarmor->bipedModelData.bipedObjectSlots & 0x1) {	//Helmet exclusive
+				} else if (invarmor->bipedModelData.bipedObjectSlots & 0x1) {  //Helmet exclusive
 					ExtraInstanceData* extraInstanceData = (ExtraInstanceData*)invitem->stackData->extra->GetByType(EXTRA_DATA_TYPE::kInstanceData);
 					if (extraInstanceData) {
 						instanceData = ((TESObjectARMO::InstanceData*)extraInstanceData->data.get());
 						helmetAR = instanceData->rating;
-					}
-					else {
+					} else {
 						helmetAR = invdata->rating;
 					}
 					if (instanceData->damageTypes) {
@@ -870,9 +903,11 @@ void CalculateArmorTiers(Actor* a) {
 * 아래 이벤트들이 담당
 */
 
-class EquipWatcher : public BSTEventSink<TESEquipEvent> {
+class EquipWatcher : public BSTEventSink<TESEquipEvent>
+{
 public:
-	virtual BSEventNotifyControl ProcessEvent(const TESEquipEvent& evn, BSTEventSource<TESEquipEvent>* a_source) {
+	virtual BSEventNotifyControl ProcessEvent(const TESEquipEvent& evn, BSTEventSource<TESEquipEvent>* a_source)
+	{
 		TESForm* item = TESForm::GetFormByID(evn.formId);
 		if (item && item->formType == ENUM_FORM_ID::kARMO) {
 			CalculateArmorTiers(evn.a);
@@ -882,9 +917,11 @@ public:
 	F4_HEAP_REDEFINE_NEW(EquipEventSink);
 };
 
-class ObjectLoadWatcher : public BSTEventSink<TESObjectLoadedEvent> {
+class ObjectLoadWatcher : public BSTEventSink<TESObjectLoadedEvent>
+{
 public:
-	virtual BSEventNotifyControl ProcessEvent(const TESObjectLoadedEvent& evn, BSTEventSource<TESObjectLoadedEvent>* a_source) {
+	virtual BSEventNotifyControl ProcessEvent(const TESObjectLoadedEvent& evn, BSTEventSource<TESObjectLoadedEvent>* a_source)
+	{
 		if (!evn.loaded) {
 			return BSEventNotifyControl::kContinue;
 		}
@@ -898,8 +935,10 @@ public:
 	F4_HEAP_REDEFINE_NEW(ObjectLoadWatcher);
 };
 
-class MenuWatcher : public BSTEventSink<MenuOpenCloseEvent> {
-	virtual BSEventNotifyControl ProcessEvent(const MenuOpenCloseEvent& evn, BSTEventSource<MenuOpenCloseEvent>* src) override {
+class MenuWatcher : public BSTEventSink<MenuOpenCloseEvent>
+{
+	virtual BSEventNotifyControl ProcessEvent(const MenuOpenCloseEvent& evn, BSTEventSource<MenuOpenCloseEvent>* src) override
+	{
 		if (!evn.opening && evn.menuName == BSFixedString("HUDMenu")) {
 			if (CheckPA(p)) {
 				CalculateArmorTiers(p);
@@ -907,6 +946,7 @@ class MenuWatcher : public BSTEventSink<MenuOpenCloseEvent> {
 		}
 		return BSEventNotifyControl::kContinue;
 	}
+
 public:
 	F4_HEAP_REDEFINE_NEW(MenuWatcher);
 };
@@ -917,9 +957,11 @@ public:
 * 내구도가 닳은 후를 기준으로 계산하기 위해서 마법 효과를 이용했던 것 같은데 기억이 잘 안남
 */
 std::random_device rd;
-class MGEFWatcher : public BSTEventSink<TESMagicEffectApplyEvent> {
+class MGEFWatcher : public BSTEventSink<TESMagicEffectApplyEvent>
+{
 public:
-	virtual BSEventNotifyControl ProcessEvent(const TESMagicEffectApplyEvent& evn, BSTEventSource<TESMagicEffectApplyEvent>* a_source) {
+	virtual BSEventNotifyControl ProcessEvent(const TESMagicEffectApplyEvent& evn, BSTEventSource<TESMagicEffectApplyEvent>* a_source)
+	{
 		EffectSetting* mgef = static_cast<EffectSetting*>(TESForm::GetFormByID(evn.magicEffectFormID));
 		//성능을 위해서 활성화된 마법 효과 중 타입 정보가 일치하는 마법 효과에 대해서만 계산함
 		if (mgef->data.flags == 0x18008010 && mgef->data.castingType.underlying() == 1 && mgef->data.delivery.underlying() == 1) {
@@ -946,12 +988,9 @@ public:
 										hasDeathChance = deathCondition >= a->GetActorValue(*enduranceCondition);
 										_MESSAGE("Vest Tier %d", tier);
 										_MESSAGE("Torso base condition %f inc %f final %f current %f", cdlookup->second.deathConditions[1], cdlookup->second.fatalityIncrement, deathCondition, a->GetActorValue(*enduranceCondition));
-									}
-									else {
+									} else {
 										float deathCondition = min(cdlookup->second.deathConditions[0] - headFatalityDecPerTier * tier + cdlookup->second.fatalityIncrement, 100.f);
-										hasDeathChance = deathCondition >= a->GetActorValue(*perceptionCondition)
-											|| deathCondition >= a->GetActorValue(*brainCondition)
-											|| tier == 0;
+										hasDeathChance = deathCondition >= a->GetActorValue(*perceptionCondition) || deathCondition >= a->GetActorValue(*brainCondition) || tier == 0;
 										_MESSAGE("Helmet Tier %d", tier);
 										_MESSAGE("Head base condition %f inc %f final %f current %f", cdlookup->second.deathConditions[0], cdlookup->second.fatalityIncrement, deathCondition, a->GetActorValue(*perceptionCondition));
 									}
@@ -967,21 +1006,19 @@ public:
 
 										if (isTorso && a->GetActorValue(*enduranceCondition) == 0) {
 											chance = 0;
-										}
-										else if (!isTorso && a->GetActorValue(*perceptionCondition) == 0) {
+										} else if (!isTorso && a->GetActorValue(*perceptionCondition) == 0) {
 											chance = 0;
 										}
-										std::mt19937 e{ rd() }; // or std::default_random_engine e{rd()};
+										std::mt19937 e{ rd() };	 // or std::default_random_engine e{rd()};
 										std::uniform_int_distribution<uint16_t> dist{ 1, 100 };
 										uint16_t result = dist(e);
-										_MESSAGE("Original Protection Chance %d TorsoDeathAvoidValue %d HeadDeathAvoidValue %d chance %d result %d", original_chance, (uint16_t)a->GetActorValue(*ActorTorsoDeathAvoid), (uint16_t)a->GetActorValue(*ActorHeadDeathAvoid), chance, result);
+										_MESSAGE("Random Death Avoid Probability %d + Torso Death Avoid Value %d or Head Death Avoid Value %d = Final Death Avoid Probability %d. Death Probability %d", original_chance, (uint16_t)a->GetActorValue(*ActorTorsoDeathAvoid), (uint16_t)a->GetActorValue(*ActorHeadDeathAvoid), chance, result);
 										if (result > chance) {
 											killDeathMarked->Cast(evn.caster.get(), a);
 											if (*ptr_engineTime - lastDeathMarkSoundTime > 0.01f && a->Get3D()) {
 												if (isTorso) {
 													F4::PlaySound(deathMarkTorsoSound, a->data.location, a->Get3D());
-												}
-												else {
+												} else {
 													F4::PlaySound(deathMarkHeadSound, a->data.location, a->Get3D());
 												}
 												lastDeathMarkSoundTime = *ptr_engineTime;
@@ -992,8 +1029,7 @@ public:
 													a->KillImpl(a, 9999, true, false);
 												}
 												_MESSAGE("---Player Killed by DeathMark---");
-											}
-											else
+											} else
 												_MESSAGE("%s(%llx) should be killed by deathmark", a->GetNPC()->fullName.c_str());
 										}
 										//즉사 회피시 메세지 표기
@@ -1010,7 +1046,7 @@ public:
 									}
 								}
 							}
-							break; //Break if deathmark was found
+							break;	//Break if deathmark was found
 						}
 					}
 				}
@@ -1025,8 +1061,10 @@ public:
 * 플레이어 사망 이벤트
 * 플레이어가 사망한 경우 적용된 체력 관련 마법 효과, 최종 신체 내구도, 체력, 마지막으로 받은 데미지 등을 출력
 */
-class PlayerDeathWatcher : public BSTEventSink<BGSActorDeathEvent> {
-	virtual BSEventNotifyControl ProcessEvent(const BGSActorDeathEvent& evn, BSTEventSource<BGSActorDeathEvent>* src) override {
+class PlayerDeathWatcher : public BSTEventSink<BGSActorDeathEvent>
+{
+	virtual BSEventNotifyControl ProcessEvent(const BGSActorDeathEvent& evn, BSTEventSource<BGSActorDeathEvent>* src) override
+	{
 		_MESSAGE("---Player Death---");
 		ActiveEffectList* aeList = p->GetActiveEffectList();
 		if (aeList) {
@@ -1050,6 +1088,7 @@ class PlayerDeathWatcher : public BSTEventSink<BGSActorDeathEvent> {
 		_MESSAGE("Last Damage taken\t%f", evn.damageTaken);
 		return BSEventNotifyControl::kContinue;
 	}
+
 public:
 	F4_HEAP_REDEFINE_NEW(PlayerDeathWatcher);
 };
@@ -1058,33 +1097,41 @@ public:
 
 #pragma region Event Sources
 
-class HitEventSource : public BSTEventSource<TESHitEvent> {
+class HitEventSource : public BSTEventSource<TESHitEvent>
+{
 public:
-	[[nodiscard]] static HitEventSource* GetSingleton() {
+	[[nodiscard]] static HitEventSource* GetSingleton()
+	{
 		REL::Relocation<HitEventSource*> singleton{ REL::ID(989868) };
 		return singleton.get();
 	}
 };
 
-class ObjectLoadedEventSource : public BSTEventSource<TESObjectLoadedEvent> {
+class ObjectLoadedEventSource : public BSTEventSource<TESObjectLoadedEvent>
+{
 public:
-	[[nodiscard]] static ObjectLoadedEventSource* GetSingleton() {
+	[[nodiscard]] static ObjectLoadedEventSource* GetSingleton()
+	{
 		REL::Relocation<ObjectLoadedEventSource*> singleton{ REL::ID(416662) };
 		return singleton.get();
 	}
 };
 
-class EquipEventSource : public BSTEventSource<TESEquipEvent> {
+class EquipEventSource : public BSTEventSource<TESEquipEvent>
+{
 public:
-	[[nodiscard]] static EquipEventSource* GetSingleton() {
+	[[nodiscard]] static EquipEventSource* GetSingleton()
+	{
 		REL::Relocation<EquipEventSource*> singleton{ REL::ID(485633) };
 		return singleton.get();
 	}
 };
 
-class MGEFApplyEventSource : public BSTEventSource<TESMagicEffectApplyEvent> {
+class MGEFApplyEventSource : public BSTEventSource<TESMagicEffectApplyEvent>
+{
 public:
-	[[nodiscard]] static MGEFApplyEventSource* GetSingleton() {
+	[[nodiscard]] static MGEFApplyEventSource* GetSingleton()
+	{
 		REL::Relocation<MGEFApplyEventSource*> singleton{ REL::ID(1481228) };
 		return singleton.get();
 	}
@@ -1104,11 +1151,13 @@ public:
 * 쌩 탄약 데미지를 이용해서 즉사 확률 계산 후 저장
 * 데스마크 실행
 */
-class HookProjectile : public Projectile {
+class HookProjectile : public Projectile
+{
 public:
-	typedef bool (HookProjectile::* FnProcessImpacts)();
+	typedef bool (HookProjectile::*FnProcessImpacts)();
 
-	bool CheckPlayerHitBoneHardcoded() {
+	bool CheckPlayerHitBoneHardcoded()
+	{
 		Projectile::ImpactData& ipct = this->impacts[0];
 		//전체 데미지를 알아내기 위해 무기의 인스턴스 데이터에서 속성 데미지들의 합을 가져옴
 		float additionalDamage = 0;
@@ -1126,23 +1175,33 @@ public:
 		//실제 데미지가 있는 탄이 로드된 셀에 존재하는 살아있는 액터를 맞췄을 때 실행
 		float calculatedDamage = (this->damage + additionalDamage) / numProj;
 		float physDamage = this->damage / numProj;
-		if (calculatedDamage > 5 && 
-			this->impacts.size() > 0 && 
-			!ipct.processed 
-			&& ipct.collidee.get() 
-			&& ipct.collidee.get().get()->formType == ENUM_FORM_ID::kACHR 
-			&& ipct.colObj
-			&& ipct.collidee.get()->parentCell
-			&& !ipct.collidee.get()->IsDead(true)) {
+		if (calculatedDamage > 5 &&
+			this->impacts.size() > 0 &&
+			!ipct.processed && ipct.collidee.get() && ipct.collidee.get().get()->formType == ENUM_FORM_ID::kACHR && ipct.colObj && ipct.collidee.get()->parentCell && !ipct.collidee.get()->IsDead(true)) {
 			Actor* a = static_cast<Actor*>(ipct.collidee.get().get());
 			NiAVObject* parent = ipct.colObj.get()->sceneObject;
 			if (parent) {
 				_MESSAGE("Projectile %llx (formid %llx)", this, this->formID);
 
-				if (a == PlayerCharacter::GetSingleton())
-					_MESSAGE("%s(Player) got hit on %s", a->GetNPC()->fullName.c_str(), parent->name.c_str());
-				else
-					_MESSAGE("%s(%llx) got hit on %s", a->GetNPC()->fullName.c_str(), a, parent->name.c_str());
+				bool targetUnknown = false;
+				if (a->GetNPC()) {
+					if (!a->GetNPC()->fullName.c_str() || a->GetNPC()->fullName.length() == 0) {
+						targetUnknown = true;
+					}
+				} else {
+					targetUnknown = true;
+				}
+
+				if (!targetUnknown) {
+					if (a == p) {
+						_MESSAGE("%s(Player) got hit on %s", a->GetNPC()->fullName.c_str(), parent->name.c_str());
+					} else {
+						_MESSAGE("%s(%llx) got hit on %s", a->GetNPC()->fullName.c_str(), a, parent->name.c_str());
+					}
+				} else {
+					_MESSAGE("Unknown(%llx) got hit on %s", a, parent->name.c_str());
+				}
+
 				int partType = -1;
 				if (ipct.damageLimb.underlying() >= 0) {
 					partType = ipct.damageLimb.underlying();
@@ -1151,11 +1210,9 @@ public:
 					//손은 파트 타입이 지정되지 않아있어서 하드코딩
 					if (parent->name == std::string_view("LArm_Hand")) {
 						partType = 6;
-					}
-					else if (parent->name == std::string_view("RArm_Hand")) {
+					} else if (parent->name == std::string_view("RArm_Hand")) {
 						partType = 8;
-					}
-					else {
+					} else {
 						partType = 0;
 					}
 				}
@@ -1164,14 +1221,13 @@ public:
 				TESAmmo* ammo = this->ammoSource;
 				if (ammo) {
 					_MESSAGE("Ammo : %s (FormID %llx) - Projectile FormID %llx",
-								this->ammoSource->fullName.c_str(), this->ammoSource->formID,
-								this->ammoSource->data.projectile->formID);
-				}
-				else if (this->weaponSource.object && this->weaponSource.object->formType == ENUM_FORM_ID::kWEAP) {
+						this->ammoSource->fullName.c_str(), this->ammoSource->formID,
+						this->ammoSource->data.projectile->formID);
+				} else if (this->weaponSource.object && this->weaponSource.object->formType == ENUM_FORM_ID::kWEAP) {
 					ammo = static_cast<TESObjectWEAP::InstanceData*>(this->weaponSource.instanceData.get())->ammo;
 					_MESSAGE("Ammo : %s (FormID %llx) - Projectile FormID %llx",
-								ammo->fullName.c_str(), ammo->formID,
-								ammo->data.projectile->formID);
+						ammo->fullName.c_str(), ammo->formID,
+						ammo->data.projectile->formID);
 				}
 
 				//데스마크 제외 종족 확인
@@ -1200,9 +1256,21 @@ public:
 					}
 					if (!partFound) {
 						a->SetActorValue(*lasthitpart, 7);
-					}
-					else {
+					} else {
 						_MESSAGE("Node : %s is %s (partType %d)", parent->name.c_str(), EFDBodyPartsName[partFound].c_str(), partType);
+						if (a != p && !strcmp(EFDBodyPartsName[partFound].c_str(), "Head")) {
+							SetRicochetValue(a);
+							_MESSAGE("Recalculate Ricochet Probability");
+						} else if (a == p && !strcmp(EFDBodyPartsName[partFound].c_str(), "Head")) {
+							SetRicochetValue(a);
+						} else if (a != p && !strcmp(EFDBodyPartsName[partFound].c_str(), "Torso") && a->GetActorValue(*ActorTorsoDeathAvoid) > 0) {
+							a->ModActorValue(ACTOR_VALUE_MODIFIER::Damage, *ActorTorsoDeathAvoid, -1);
+							_MESSAGE("Enemy Torso Death Avoid -1");
+						} else if (a == p && !strcmp(EFDBodyPartsName[partFound].c_str(), "Torso") && a->GetActorValue(*ActorTorsoDeathAvoid) > 0) {
+							a->ModActorValue(ACTOR_VALUE_MODIFIER::Damage, *ActorTorsoDeathAvoid, -1);
+							_MESSAGE("Player Torso Death Avoid -1");
+						}
+
 						//물리데미지 탄에 대해서만 출혈 적용
 						if (physDamage > 0 && !this->IsBeamProjectile()) {
 							_MESSAGE("Physical projectile with base damage %f", physDamage);
@@ -1213,8 +1281,7 @@ public:
 								BleedingData& bld = bleedingConfigs.at((EFDBodyParts)partFound);
 								_MESSAGE("Bleeding condition start %f current %f", bld.conditionStart, a->GetActorValue(**EFDConditions[partFound]));
 								if (bld.conditionStart >= a->GetActorValue(**EFDConditions[partFound])) {
-									float bleedChance = bld.chanceMin
-										+ (bld.chanceMax - bld.chanceMin) * (bld.conditionStart - max(bld.conditionThreshold, a->GetActorValue(**EFDConditions[partFound]))) / (bld.conditionStart - bld.conditionThreshold);
+									float bleedChance = bld.chanceMin + (bld.chanceMax - bld.chanceMin) * (bld.conditionStart - max(bld.conditionThreshold, a->GetActorValue(**EFDConditions[partFound]))) / (bld.conditionStart - bld.conditionThreshold);
 									std::mt19937 e{ rd() };
 									std::uniform_real_distribution<float> dist{ 0, 100 };
 									float result = dist(e);
@@ -1234,8 +1301,7 @@ public:
 											bleedae->magnitude -= bleedmag;
 											bleedae->elapsed = 0;
 											_MESSAGE("Current bleeding magnitude %f", bleedae->magnitude * -1.0f);
-										}
-										else {
+										} else {
 											bld.spell->listOfEffects[0]->data.magnitude = bld.initialDamage + bleedmag;
 											bld.spell->listOfEffects[1]->data.magnitude = bld.initialDamage + bleedmag;
 											bld.spell->Cast(a, a);
@@ -1243,19 +1309,17 @@ public:
 										}
 									}
 								}
-							}
-							else {
+							} else {
 								_MESSAGE("ActiveEffectList not found. Bleeding can't be processed");
 							}
 							//머리나 몸통에 맞은 경우에만 즉사 확률 업데이트
 							if (partFound <= 2) {
 								CartridgeData& gcd = cartridgeData.at(std::string("Global"));
 								for (int j = 0; j < maxTier; ++j) {
-									if (partFound == 1) {	//머리
+									if (partFound == 1) {  //머리
 										gcd.fatalityIncrement = pow(calculatedDamage / fi.formulaA, fi.formulaB) * fi.formulaC * headFatalityDecPerTier;
 										gcd.protectionChances[j] = (uint16_t)max(min(log10(vestRatings[j] / gdHead.formulaA + 1.0f) * gdHead.formulaB + (gdHead.formulaC - calculatedDamage) * 0.25f + gdHead.formulaD, 100), 0);
-									}
-									else {	//몸통
+									} else {  //몸통
 										gcd.fatalityIncrement = pow(calculatedDamage / fi.formulaA, fi.formulaB) * fi.formulaC * torsoFatalityDecPerTier;
 										gcd.protectionChances[j] = (uint16_t)max(min(log10(vestRatings[j] / gdTorso.formulaA + 1.0f) * gdTorso.formulaB + (gdTorso.formulaC - calculatedDamage) * 0.25f + gdTorso.formulaD, 100), 0);
 									}
@@ -1274,16 +1338,19 @@ public:
 		return fn ? (this->*fn)() : false;
 	}
 
-	static void HookProcessImpacts(uint64_t addr, uint64_t offset) {
+	static void HookProcessImpacts(uint64_t addr, uint64_t offset)
+	{
 		FnProcessImpacts fn = SafeWrite64Function(addr + offset, &HookProjectile::CheckPlayerHitBoneHardcoded);
 		fnHash.insert(std::pair<uint64_t, FnProcessImpacts>(addr, fn));
 	}
+
 protected:
 	static std::unordered_map<uint64_t, FnProcessImpacts> fnHash;
 };
 std::unordered_map<uint64_t, HookProjectile::FnProcessImpacts> HookProjectile::fnHash;
 
-void SetupProjectile() {
+void SetupProjectile()
+{
 	uint64_t addr;
 	uint64_t offset = 0x680;
 	addr = MissileProjectile::VTABLE[0].address();
@@ -1299,7 +1366,8 @@ void SetupProjectile() {
 
 #pragma region F4SE Initialize
 
-extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface * a_f4se, F4SE::PluginInfo * a_info) {
+extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a_f4se, F4SE::PluginInfo* a_info)
+{
 #ifndef NDEBUG
 	auto sink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
 #else
