@@ -1014,7 +1014,7 @@ public:
 										uint16_t result = dist(e);
 										_MESSAGE("Random Death Avoid Probability %d + Torso Death Avoid Value %d or Head Death Avoid Value %d = Final Death Avoid Probability %d. Death Probability %d", original_chance, (uint16_t)a->GetActorValue(*ActorTorsoDeathAvoid), (uint16_t)a->GetActorValue(*ActorHeadDeathAvoid), chance, result);
 										if (result > chance) {
-											killDeathMarked->Cast(evn.caster.get(), a);
+											killDeathMarked->Cast(evn.caster.get(), a, a, GameVM::GetSingleton()->GetVM().get());
 											if (*ptr_engineTime - lastDeathMarkSoundTime > 0.01f && a->Get3D()) {
 												if (isTorso) {
 													F4::PlaySound(deathMarkTorsoSound, a->data.location, a->Get3D());
@@ -1034,7 +1034,7 @@ public:
 										}
 										//즉사 회피시 메세지 표기
 										else if (a == p) {
-											avoidedDeath->Cast(a, a);
+											avoidedDeath->Cast(a, a, a, GameVM::GetSingleton()->GetVM().get());
 											F4::ShakeCamera(1.0f, a->data.location, 0.2f, 1.0f);
 											F4::PlaySound(avoidedDeathSound, p->data.location, PlayerCamera::GetSingleton()->cameraRoot.get());
 											F4::ApplyImageSpaceModifier(avoidedDeathIMOD, 1.0f, nullptr);
@@ -1304,7 +1304,7 @@ public:
 										} else {
 											bld.spell->listOfEffects[0]->data.magnitude = bld.initialDamage + bleedmag;
 											bld.spell->listOfEffects[1]->data.magnitude = bld.initialDamage + bleedmag;
-											bld.spell->Cast(a, a);
+											bld.spell->Cast(a, a, a, GameVM::GetSingleton()->GetVM().get());
 											_MESSAGE("Bleeding start magnitude %f", bld.initialDamage + bleedmag);
 										}
 									}
@@ -1327,7 +1327,7 @@ public:
 							}
 							//즉사 효과 발동
 							if (this->shooter.get()) {
-								EFDDeathMarkGlobal->Cast(this->shooter.get().get(), a);
+								EFDDeathMarkGlobal->Cast(this->shooter.get().get(), a, a, GameVM::GetSingleton()->GetVM().get());
 							}
 						}
 					}
