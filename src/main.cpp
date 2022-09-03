@@ -1030,7 +1030,7 @@ public:
 												}
 												_MESSAGE("---Player Killed by DeathMark---");
 											} else
-												_MESSAGE("%s(%llx) should be killed by deathmark", a->GetNPC()->fullName.c_str());
+												_MESSAGE("---DeathMark activated---");
 										}
 										//즉사 회피시 메세지 표기
 										else if (a == p) {
