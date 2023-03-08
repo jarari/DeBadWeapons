@@ -757,29 +757,6 @@ void SetupBleeding()
 
 #pragma region Events
 
-struct ActorEquipManagerEvent::Event
-{
-	uint32_t unk00;			   //00
-	uint8_t pad04[0x7 - 0x4];  //04
-	bool isUnequip;			   //07
-	void* unk08;			   //08
-	Actor* a;				   //10	equip target
-};
-
-struct TESObjectLoadedEvent
-{
-	uint32_t formId;  //00
-	uint8_t loaded;	  //08
-};
-
-struct TESEquipEvent
-{
-	Actor* a;		  //00
-	uint32_t formId;  //0C
-	uint32_t unk08;	  //08
-	uint64_t flag;	  //10 0x00000000ff000000 for unequip
-};
-
 //*********************Biped Slots********************
 // 30	-	0x1
 // 31	-	0x2
@@ -852,7 +829,7 @@ void CalculateArmorTiers(Actor* a)
 	for (auto invitem = a->inventoryList->data.begin(); invitem != a->inventoryList->data.end(); ++invitem) {
 		if (invitem->object->formType == ENUM_FORM_ID::kARMO) {
 			TESObjectARMO* invarmor = static_cast<TESObjectARMO*>(invitem->object);
-			TESObjectARMO::InstanceData* invdata = &(invarmor->data);
+			TESObjectARMO::InstanceData* invdata = &(invarmor->armorData);
 			TESObjectARMO::InstanceData* instanceData = invdata;
 			if (invitem->stackData->IsEquipped()) {
 				if (invarmor->bipedModelData.bipedObjectSlots & 0x800 || invarmor->bipedModelData.bipedObjectSlots & 0x40) {  //Vest
@@ -964,7 +941,7 @@ public:
 	{
 		EffectSetting* mgef = static_cast<EffectSetting*>(TESForm::GetFormByID(evn.magicEffectFormID));
 		//성능을 위해서 활성화된 마법 효과 중 타입 정보가 일치하는 마법 효과에 대해서만 계산함
-		if (mgef->data.flags == 0x18008010 && mgef->data.castingType.underlying() == 1 && mgef->data.delivery.underlying() == 1) {
+		if (mgef->data.flags.underlying() == 0x18008010 && mgef->data.castingType.underlying() == 1 && mgef->data.delivery.underlying() == 1) {
 			if (evn.target->formType == ENUM_FORM_ID::kACHR) {
 				Actor* a = ((Actor*)evn.target.get());
 				if (a->GetActorValue(*lasthitpart) <= 2 && !a->IsDead(true)) {
@@ -1070,7 +1047,7 @@ class PlayerDeathWatcher : public BSTEventSink<BGSActorDeathEvent>
 		if (aeList) {
 			for (auto it = aeList->data.begin(); it != aeList->data.end(); ++it) {
 				ActiveEffect* ae = it->get();
-				if (ae && !(ae->flags & ActiveEffect::kFlag_Inactive)) {
+				if (ae && !(ae->flags & ActiveEffect::Flags::kInactive)) {
 					EffectSetting* avEffectSetting = *(EffectSetting**)((uint64_t)(it->get()->effect) + 0x10);
 					if (avEffectSetting && avEffectSetting->data.primaryAV == health) {
 						_MESSAGE("Active Effect : %s with magnitude %f", avEffectSetting->fullName.c_str(), ae->magnitude);
@@ -1091,50 +1068,6 @@ class PlayerDeathWatcher : public BSTEventSink<BGSActorDeathEvent>
 
 public:
 	F4_HEAP_REDEFINE_NEW(PlayerDeathWatcher);
-};
-
-#pragma endregion
-
-#pragma region Event Sources
-
-class HitEventSource : public BSTEventSource<TESHitEvent>
-{
-public:
-	[[nodiscard]] static HitEventSource* GetSingleton()
-	{
-		REL::Relocation<HitEventSource*> singleton{ REL::ID(989868) };
-		return singleton.get();
-	}
-};
-
-class ObjectLoadedEventSource : public BSTEventSource<TESObjectLoadedEvent>
-{
-public:
-	[[nodiscard]] static ObjectLoadedEventSource* GetSingleton()
-	{
-		REL::Relocation<ObjectLoadedEventSource*> singleton{ REL::ID(416662) };
-		return singleton.get();
-	}
-};
-
-class EquipEventSource : public BSTEventSource<TESEquipEvent>
-{
-public:
-	[[nodiscard]] static EquipEventSource* GetSingleton()
-	{
-		REL::Relocation<EquipEventSource*> singleton{ REL::ID(485633) };
-		return singleton.get();
-	}
-};
-
-class MGEFApplyEventSource : public BSTEventSource<TESMagicEffectApplyEvent>
-{
-public:
-	[[nodiscard]] static MGEFApplyEventSource* GetSingleton()
-	{
-		REL::Relocation<MGEFApplyEventSource*> singleton{ REL::ID(1481228) };
-		return singleton.get();
-	}
 };
 
 #pragma endregion
@@ -1291,7 +1224,7 @@ public:
 										ActiveEffect* bleedae = nullptr;
 										for (auto it = aeList->data.begin(); it != aeList->data.end(); ++it) {
 											ActiveEffect* ae = it->get();
-											if (ae && !(ae->flags & ActiveEffect::kFlag_Inactive) && ae->item == bld.spell) {
+											if (ae && !(ae->flags & ActiveEffect::Flags::kInactive) && ae->item == bld.spell) {
 												bleedae = ae;
 												_MESSAGE("%s is already bleeding", EFDBodyPartsName[partFound].c_str());
 											}
@@ -1397,13 +1330,13 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 	a_info->version = 1;
 
 	if (a_f4se->IsEditor()) {
-		logger::critical("loaded in editor"sv);
+		logger::critical(FMT_STRING("loaded in editor"));
 		return false;
 	}
 
 	const auto ver = a_f4se->RuntimeVersion();
 	if (ver < F4SE::RUNTIME_1_10_162) {
-		logger::critical("unsupported runtime v{}"sv, ver.string());
+		logger::critical(FMT_STRING("unsupported runtime v{}"), ver.string());
 		return false;
 	}
 
